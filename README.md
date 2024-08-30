@@ -1,19 +1,19 @@
 
-# ILovePDF OCR Automation
+# iLovePDF OCR Automation
 
-ILovePDF OCR Automation is a desktop application built with Electron that automates the process of Optical Character Recognition (OCR) for PDF files using the ILovePDF API. The application allows users to select PDF files, apply OCR, and save the processed documents either in their original directories or in a chosen output folder. The app is designed for both development and production environments with secure API key management.
+iLovePDF OCR Automation is a desktop application built with Electron that automates the process of Optical Character Recognition (OCR) for PDF files using the iLovePDF API. The application allows users to select PDF files, apply OCR, and save the processed documents either in their original directories or in a chosen output folder. The app is designed for both development and production environments with secure API key management.
 
 ## Features
 
-- **OCR Processing:** Automate the OCR process for multiple PDF files using the ILovePDF API.
+- **OCR Processing:** Automate the OCR process for multiple PDF files using the iLovePDF API.
 - **File Selection:** Easily select multiple PDF files from your file system.
 - **Output Options:** Choose to save processed files in their original directory or specify an output folder.
 - **Progress Tracking:** View progress as files are processed.
-- **API Key Management:** Securely manage your ILovePDF API keys through environment variables or direct input.
+- **API Key Management:** Securely manage your iLovePDF API keys through environment variables or direct input.
 
 ## Installation
 
-To get started with ILovePDF OCR Automation, follow these steps:
+To get started with iLovePDF OCR Automation, follow these steps:
 
 1. **Clone the Repository:**
 
@@ -32,7 +32,7 @@ To get started with ILovePDF OCR Automation, follow these steps:
 
 3. **Set Up Environment Variables:**
 
-   Create a `.env` file in the root directory and add your ILovePDF API keys:
+   Create a `.env` file in the root directory and add your iLovePDF API keys:
 
    ```bash
    ILOVEPDF_PROJECT_PUBLIC_KEY=your_public_key
@@ -56,7 +56,7 @@ To get started with ILovePDF OCR Automation, follow these steps:
 ## Usage
 
 1. **Launch the Application:** Run the application using `npm start` or the executable generated from the build process.
-2. **Enter API Keys:** If not already set in the `.env` file, enter your ILovePDF API keys in the provided fields.
+2. **Enter API Keys:** If not already set in the `.env` file, enter your iLovePDF API keys in the provided fields.
 3. **Select PDF Files:** Click the "Select PDF Files" button to choose the files you want to process.
 4. **Choose Output Options:** Decide whether to save files in their original directory or a new output folder.
 5. **Process Files:** Click "Process Selected Files" to start the OCR process. Monitor progress until completion.
@@ -65,7 +65,7 @@ To get started with ILovePDF OCR Automation, follow these steps:
 
 - **Electron:** Framework for building cross-platform desktop apps.
 - **Node.js:** JavaScript runtime for backend processing.
-- **ILovePDF API:** API used for performing OCR on PDF files.
+- **iLovePDF API:** API used for performing OCR on PDF files.
 - **Electron-Store:** Library for managing persistent storage in Electron apps.
 - **ADM-Zip:** Library for handling ZIP file extraction.
 
@@ -85,5 +85,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-- Thanks to [ILovePDF](https://www.ilovepdf.com/) for providing the OCR API used in this application.
+- Thanks to [iLovePDF](https://www.ilovepdf.com/) for providing the OCR API used in this application.
 - Icons used in the application are from [Flaticon](https://www.flaticon.com/).
