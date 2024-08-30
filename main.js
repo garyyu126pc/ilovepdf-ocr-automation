@@ -98,11 +98,11 @@ ipcMain.handle("process-pdfs", async (event, filePaths, saveToOriginalDir, outpu
     event.sender.send("processing-complete");
   } catch (error) {
     if (error.response && error.response.status === 400) {
-      // If it's a 400 error, it likely means the API keys are incorrect or the request is malformed
+      // Specific handling for API-related errors
       dialog.showMessageBox({
         type: "error",
-        title: "Invalid API Keys",
-        message: `The API request failed with a 400 error. This typically indicates that the API keys are incorrect or missing. Please double-check your API keys and try again.`,
+        title: "PDF Processing Error",
+        message: `There was an issue processing your request. This is likely due to an issue on the ILovePDF API side. Please try again later.`,
       });
     } else {
       dialog.showMessageBox({
@@ -111,7 +111,7 @@ ipcMain.handle("process-pdfs", async (event, filePaths, saveToOriginalDir, outpu
         message: `An error occurred while processing the PDF files.\n\nError: ${error.message}`,
       });
     }
-    throw error;
+    throw error; // Re-throw the error to ensure it’s logged or handled further if necessary
   }
 });
 
