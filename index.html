@@ -8,28 +8,54 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <h1>PDF OCR Application</h1>
+    <header class="header">
+      <h1>PDF OCR Automation</h1>
+      <p class="subtitle">Easily apply OCR to your PDF files with the ILovePDF API</p>
+    </header>
 
-    <label for="public-key">ILovePDF Project Public Key:</label><br />
-    <input type="text" id="public-key" placeholder="Enter your public key" />
+    <main class="container">
+      <section class="api-keys">
+        <fieldset>
+          <legend>API Keys</legend>
+          <div class="form-group">
+            <label for="public-key">ILovePDF Project Public Key:</label>
+            <input type="text" id="public-key" placeholder="Enter your public key" />
+          </div>
+          <div class="form-group">
+            <label for="secret-key">ILovePDF Secret Key:</label>
+            <input type="text" id="secret-key" placeholder="Enter your secret key" />
+          </div>
+        </fieldset>
+      </section>
 
-    <label for="secret-key">ILovePDF Secret Key:</label><br />
-    <input type="text" id="secret-key" placeholder="Enter your secret key" />
+      <section class="file-selection">
+        <fieldset>
+          <legend>Select PDF Files</legend>
+          <button id="select-files" class="action-button">Select PDF Files</button>
+          <div id="file-list" class="file-list"></div>
+        </fieldset>
+      </section>
 
-    <button id="select-files">Select PDF Files</button>
-    <div id="file-list"></div>
+      <section class="output-options">
+        <fieldset>
+          <legend>Output Options</legend>
+          <label class="checkbox-label">
+            <input type="checkbox" id="save-original-directory" checked />
+            Save to Original Directory
+          </label>
+          <button id="select-output-folder" class="action-button" style="display: none">Select Output Folder</button>
+          <p id="output-folder-path" class="output-path"></p>
+        </fieldset>
+      </section>
 
-    <label>
-      <input type="checkbox" id="save-original-directory" checked />
-      Save to Original Directory
-    </label>
-    <button id="select-output-folder" style="display: none">Select Output Folder</button>
-    <p id="output-folder-path"></p>
-
-    <button id="process-files">Process Selected Files</button>
-
-    <progress id="progress-bar" value="0" max="100"></progress>
-    <p id="progress-text">Progress: 0%</p>
+      <section class="actions">
+        <button id="process-files" class="action-button primary">Process Selected Files</button>
+        <div class="progress-container">
+          <progress id="progress-bar" value="0" max="100"></progress>
+          <p id="progress-text">Progress: 0%</p>
+        </div>
+      </section>
+    </main>
 
     <script src="renderer.js"></script>
   </body>
