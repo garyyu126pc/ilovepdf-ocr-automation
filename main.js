@@ -5,10 +5,10 @@ const AdmZip = require("adm-zip");
 const ILovePDFApi = require("@ilovepdf/ilovepdf-nodejs");
 const ILovePDFFile = require("@ilovepdf/ilovepdf-nodejs/ILovePDFFile");
 
-const instance = new ILovePDFApi(
-  "project_public_fcfc07ee61f5a1f15f91f73ec3b1dbc4_hrBYsc7035487740aa05ec5c30cc26d4854cb",
-  "secret_key_df9f993612c93c58904a5951fd66459e_Yx6laa2c1f059e7adf2e637e3852d7a75dc59"
-);
+// Load environment variables from .env file
+require("dotenv").config();
+
+const instance = new ILovePDFApi(process.env.ILOVEPDF_PROJECT_PUBLIC_KEY, process.env.ILOVEPDF_SECRET_KEY);
 
 function createWindow() {
   const win = new BrowserWindow({

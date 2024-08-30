@@ -12,6 +12,7 @@
   "dependencies": {
     "@ilovepdf/ilovepdf-nodejs": "^0.3.0",
     "adm-zip": "^0.5.16",
+    "dotenv": "^16.4.5",
     "electron": "^32.0.1"
   }
 }
