@@ -120,20 +120,15 @@ ipcMain.handle("process-pdfs", async (event, filePaths, saveToOriginalDir, outpu
 
     event.sender.send("processing-complete");
   } catch (error) {
-    if (error.response && error.response.status === 400) {
-      // Specific handling for API-related errors
-      dialog.showMessageBox({
-        type: "error",
-        title: "PDF Processing Error",
-        message: `There was an issue processing your request. This is likely due to an issue on the ILovePDF API side. Please try again later.`,
-      });
-    } else {
-      dialog.showMessageBox({
-        type: "error",
-        title: "Processing Error",
-        message: `An error occurred while processing the PDF files.\n\nError: ${error.message}`,
-      });
-    }
+    // Hide the progress overlay if an error occurs
+    event.sender.send("hide-progress-overlay");
+
+    // Show the error message to the user
+    dialog.showMessageBox({
+      type: "error",
+      title: "Processing Error",
+      message: `An error occurred while processing the PDF files.\n\nError: ${error.message}`,
+    });
     throw error; // Re-throw the error to ensure it’s logged or handled further if necessary
   }
 });

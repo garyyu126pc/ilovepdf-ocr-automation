@@ -51,12 +51,17 @@
 
       <section class="actions">
         <button id="process-files" class="action-button primary">Process Selected Files</button>
-        <div class="progress-container">
-          <progress id="progress-bar" value="0" max="100"></progress>
-          <p id="progress-text">Progress: 0%</p>
-        </div>
       </section>
     </main>
+
+    <!-- Progress Modal -->
+    <div id="progress-overlay">
+      <div id="progress-modal">
+        <h2>Processing...</h2>
+        <progress id="progress-bar" value="0" max="100"></progress>
+        <p id="progress-text">Progress: 0%</p>
+      </div>
+    </div>
 
     <script src="renderer.js"></script>
   </body>

@@ -27,33 +27,6 @@ document.getElementById("clear-all").addEventListener("click", () => {
   updateFileListUI();
 });
 
-// Function to update the UI with the selected files and remove buttons
-function updateFileListUI() {
-  const fileListElement = document.getElementById("file-list");
-  fileListElement.innerHTML = ""; // Clear the existing list
-
-  filePaths.forEach((filePath, index) => {
-    const fileDiv = document.createElement("div");
-    fileDiv.classList.add("file-item");
-
-    const fileNameSpan = document.createElement("span");
-    fileNameSpan.textContent = filePath;
-
-    const removeButton = document.createElement("button");
-    removeButton.textContent = "Remove";
-    removeButton.style.marginLeft = "10px";
-    removeButton.addEventListener("click", () => {
-      // Remove the selected file from the filePaths array
-      filePaths.splice(index, 1);
-      updateFileListUI(); // Update the UI after removal
-    });
-
-    fileDiv.appendChild(fileNameSpan);
-    fileDiv.appendChild(removeButton);
-    fileListElement.appendChild(fileDiv);
-  });
-}
-
 document.getElementById("save-original-directory").addEventListener("change", () => {
   const isChecked = document.getElementById("save-original-directory").checked;
   const outputFolderButton = document.getElementById("select-output-folder");
@@ -90,6 +63,10 @@ document.getElementById("process-files").addEventListener("click", async () => {
   }
 
   if (filePaths.length > 0) {
+    // Show the progress overlay before starting processing
+    const progressOverlay = document.getElementById("progress-overlay");
+    progressOverlay.style.display = "block";
+
     ipcRenderer.invoke("process-pdfs", filePaths, saveToOriginalDir, outputFolder, publicKey, secretKey);
   } else {
     alert("Please select PDF files to process.");
@@ -105,8 +82,23 @@ ipcRenderer.on("progress-update", (event, progress) => {
 
 ipcRenderer.on("processing-complete", () => {
   alert("Processing complete!");
-  document.getElementById("progress-bar").value = 0;
-  document.getElementById("progress-text").textContent = "Progress: 0%";
+
+  // Reset progress bar and hide the progress overlay
+  const progressOverlay = document.getElementById("progress-overlay");
+  progressOverlay.style.display = "none";
+  const progressBar = document.getElementById("progress-bar");
+  progressBar.value = 0;
+  const progressText = document.getElementById("progress-text");
+  progressText.textContent = "Progress: 0%";
+});
+
+ipcRenderer.on("hide-progress-overlay", () => {
+  const progressOverlay = document.getElementById("progress-overlay");
+  progressOverlay.style.display = "none";
+  const progressBar = document.getElementById("progress-bar");
+  progressBar.value = 0;
+  const progressText = document.getElementById("progress-text");
+  progressText.textContent = "Progress: 0%";
 });
 
 // Function to update the UI with the selected files and remove buttons
