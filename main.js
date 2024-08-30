@@ -39,7 +39,19 @@ ipcMain.handle("select-files", async () => {
   }
 });
 
-ipcMain.handle("process-pdfs", async (event, filePaths, saveToOriginalDir) => {
+ipcMain.handle("select-output-folder", async () => {
+  const { canceled, filePaths } = await dialog.showOpenDialog({
+    properties: ["openDirectory"],
+  });
+
+  if (canceled) {
+    return "";
+  } else {
+    return filePaths[0];
+  }
+});
+
+ipcMain.handle("process-pdfs", async (event, filePaths, saveToOriginalDir, outputFolder) => {
   try {
     const task = instance.newTask("pdfocr");
     await task.start();
@@ -57,8 +69,9 @@ ipcMain.handle("process-pdfs", async (event, filePaths, saveToOriginalDir) => {
     await task.process();
     const arrayBuffer = await task.download();
 
-    const outputFolder = saveToOriginalDir ? null : path.join(__dirname, "output");
-    if (!saveToOriginalDir && !fs.existsSync(outputFolder)) {
+    if (saveToOriginalDir) {
+      outputFolder = null;
+    } else if (!fs.existsSync(outputFolder)) {
       fs.mkdirSync(outputFolder);
     }
 
@@ -89,7 +102,9 @@ async function savePDFFiles(arrayBuffer, filePaths, outputFolder, event) {
 
   zip.getEntries().forEach((entry) => {
     if (entry.entryName.endsWith(".pdf")) {
-      const filePath = outputFolder ? path.join(outputFolder, entry.entryName) : filePaths[i];
+      const originalFilePath = filePaths[i];
+      const fileName = path.basename(originalFilePath); // Extract only the file name
+      const filePath = outputFolder ? path.join(outputFolder, fileName) : originalFilePath;
       fs.writeFileSync(filePath, entry.getData());
 
       i++;

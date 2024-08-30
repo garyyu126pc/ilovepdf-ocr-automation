@@ -5,12 +5,31 @@ document.getElementById("select-files").addEventListener("click", async () => {
   document.getElementById("file-list").textContent = filePaths.join("\n");
 });
 
+document.getElementById("save-original-directory").addEventListener("change", () => {
+  const isChecked = document.getElementById("save-original-directory").checked;
+  const outputFolderButton = document.getElementById("select-output-folder");
+  const outputFolderPath = document.getElementById("output-folder-path");
+
+  if (isChecked) {
+    outputFolderButton.style.display = "none";
+    outputFolderPath.textContent = "";
+  } else {
+    outputFolderButton.style.display = "block";
+  }
+});
+
+document.getElementById("select-output-folder").addEventListener("click", async () => {
+  const outputFolder = await ipcRenderer.invoke("select-output-folder");
+  document.getElementById("output-folder-path").textContent = outputFolder;
+});
+
 document.getElementById("process-files").addEventListener("click", async () => {
   const filePaths = document.getElementById("file-list").textContent.split("\n");
   const saveToOriginalDir = document.getElementById("save-original-directory").checked;
+  const outputFolder = document.getElementById("output-folder-path").textContent;
 
   if (filePaths.length > 0 && filePaths[0]) {
-    ipcRenderer.invoke("process-pdfs", filePaths, saveToOriginalDir);
+    ipcRenderer.invoke("process-pdfs", filePaths, saveToOriginalDir, outputFolder);
   } else {
     alert("Please select PDF files to process.");
   }
