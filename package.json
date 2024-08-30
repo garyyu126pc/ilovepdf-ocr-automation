@@ -1,18 +1,37 @@
 {
-  "name": "ilovepdf-ocr-automation",
+  "name": "your-app-name",
   "version": "1.0.0",
+  "description": "Your app description",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "build": {
+    "appId": "com.yourcompany.yourapp",
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "files": [
+      "main.js",
+      "renderer.js",
+      "index.html",
+      "package.json",
+      "node_modules/**"
+    ],
+    "directories": {
+      "buildResources": "build"
+    }
+  },
+  "devDependencies": {
+    "electron": "^23.0.0",
+    "electron-builder": "^23.6.0"
+  },
   "dependencies": {
-    "@ilovepdf/ilovepdf-nodejs": "^0.3.0",
-    "adm-zip": "^0.5.16",
-    "dotenv": "^16.4.5",
-    "electron": "^32.0.1"
+    "adm-zip": "^0.4.7",
+    "@ilovepdf/ilovepdf-nodejs": "^1.0.0",
+    "dotenv": "^16.0.0",
+    "electron-store": "^8.0.0"
   }
 }
