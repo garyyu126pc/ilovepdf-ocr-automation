@@ -15,8 +15,8 @@ const store = new Store();
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1024, // Default width
+    height: 1024, // Default height
     webPreferences: {
       preload: path.join(__dirname, "renderer.js"),
       nodeIntegration: true,

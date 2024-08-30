@@ -89,6 +89,14 @@ input[type="text"] {
   background-color: #218838;
 }
 
+.action-button.danger {
+  background-color: #dc3545;
+}
+
+.action-button.danger:hover {
+  background-color: #c82333;
+}
+
 .checkbox-label {
   display: flex;
   align-items: center;

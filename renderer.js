@@ -19,6 +19,41 @@ document.getElementById("select-files").addEventListener("click", async () => {
   updateFileListUI();
 });
 
+document.getElementById("clear-all").addEventListener("click", () => {
+  // Clear the filePaths array
+  filePaths = [];
+
+  // Update the UI to reflect the cleared state
+  updateFileListUI();
+});
+
+// Function to update the UI with the selected files and remove buttons
+function updateFileListUI() {
+  const fileListElement = document.getElementById("file-list");
+  fileListElement.innerHTML = ""; // Clear the existing list
+
+  filePaths.forEach((filePath, index) => {
+    const fileDiv = document.createElement("div");
+    fileDiv.classList.add("file-item");
+
+    const fileNameSpan = document.createElement("span");
+    fileNameSpan.textContent = filePath;
+
+    const removeButton = document.createElement("button");
+    removeButton.textContent = "Remove";
+    removeButton.style.marginLeft = "10px";
+    removeButton.addEventListener("click", () => {
+      // Remove the selected file from the filePaths array
+      filePaths.splice(index, 1);
+      updateFileListUI(); // Update the UI after removal
+    });
+
+    fileDiv.appendChild(fileNameSpan);
+    fileDiv.appendChild(removeButton);
+    fileListElement.appendChild(fileDiv);
+  });
+}
+
 document.getElementById("save-original-directory").addEventListener("change", () => {
   const isChecked = document.getElementById("save-original-directory").checked;
   const outputFolderButton = document.getElementById("select-output-folder");
