@@ -26,8 +26,8 @@
     }
   },
   "devDependencies": {
-    "electron": "^23.0.0",
-    "electron-builder": "^23.6.0"
+    "electron": "^32.0.1",
+    "electron-builder": "^24.13.3"
   },
   "dependencies": {
     "@ilovepdf/ilovepdf-nodejs": "^0.3.0",

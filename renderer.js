@@ -1,5 +1,8 @@
 const { ipcRenderer } = require("electron");
 
+// Initialize an empty array to store file paths
+let filePaths = [];
+
 document.addEventListener("DOMContentLoaded", async () => {
   const { publicKey, secretKey } = await ipcRenderer.invoke("get-keys");
   if (publicKey) document.getElementById("public-key").value = publicKey;
@@ -7,7 +10,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 document.getElementById("select-files").addEventListener("click", async () => {
-  const filePaths = await ipcRenderer.invoke("select-files");
+  const newFilePaths = await ipcRenderer.invoke("select-files");
+
+  // Append new file paths to the existing array
+  filePaths = [...filePaths, ...newFilePaths];
+
+  // Update the UI to show all selected files
   document.getElementById("file-list").textContent = filePaths.join("\n");
 });
 
@@ -30,7 +38,6 @@ document.getElementById("select-output-folder").addEventListener("click", async 
 });
 
 document.getElementById("process-files").addEventListener("click", async () => {
-  const filePaths = document.getElementById("file-list").textContent.split("\n");
   const saveToOriginalDir = document.getElementById("save-original-directory").checked;
   const outputFolder = document.getElementById("output-folder-path").textContent;
 
@@ -47,7 +54,7 @@ document.getElementById("process-files").addEventListener("click", async () => {
     return;
   }
 
-  if (filePaths.length > 0 && filePaths[0]) {
+  if (filePaths.length > 0) {
     ipcRenderer.invoke("process-pdfs", filePaths, saveToOriginalDir, outputFolder, publicKey, secretKey);
   } else {
     alert("Please select PDF files to process.");
