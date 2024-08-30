@@ -1,0 +1,17 @@
+{
+  "name": "ilovepdf-ocr-automation",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@ilovepdf/ilovepdf-nodejs": "^0.3.0",
+    "adm-zip": "^0.5.16",
+    "electron": "^32.0.1"
+  }
+}
