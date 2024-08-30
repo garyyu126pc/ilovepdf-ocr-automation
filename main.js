@@ -44,8 +44,14 @@ ipcMain.handle("process-pdfs", async (event, filePaths, saveToOriginalDir) => {
     const task = instance.newTask("pdfocr");
     await task.start();
 
+    const totalFiles = filePaths.length;
+    let processedFiles = 0;
+
     for (const filePath of filePaths) {
       await task.addFile(new ILovePDFFile(filePath));
+      processedFiles++;
+      const progress = Math.floor((processedFiles / totalFiles) * 100);
+      event.sender.send("progress-update", progress);
     }
 
     await task.process();
@@ -60,10 +66,10 @@ ipcMain.handle("process-pdfs", async (event, filePaths, saveToOriginalDir) => {
       const filePath = saveToOriginalDir ? filePaths[0] : path.join(outputFolder, path.basename(filePaths[0]));
       await savePDFFile(arrayBuffer, filePath);
     } else {
-      await savePDFFiles(arrayBuffer, filePaths, outputFolder);
+      await savePDFFiles(arrayBuffer, filePaths, outputFolder, event);
     }
 
-    return "Processing complete!";
+    event.sender.send("processing-complete");
   } catch (error) {
     console.error("Error processing the PDF files:", error);
     throw error;
@@ -75,15 +81,20 @@ async function savePDFFile(arrayBuffer, filePath) {
   await fs.promises.writeFile(filePath, buffer);
 }
 
-async function savePDFFiles(arrayBuffer, filePaths, outputFolder) {
+async function savePDFFiles(arrayBuffer, filePaths, outputFolder, event) {
   const buffer = Buffer.from(arrayBuffer);
   const zip = new AdmZip(buffer);
   let i = 0;
+  const totalFiles = filePaths.length;
+
   zip.getEntries().forEach((entry) => {
     if (entry.entryName.endsWith(".pdf")) {
       const filePath = outputFolder ? path.join(outputFolder, entry.entryName) : filePaths[i];
       fs.writeFileSync(filePath, entry.getData());
+
       i++;
+      const progress = Math.floor((i / totalFiles) * 100);
+      event.sender.send("progress-update", progress);
     }
   });
 }

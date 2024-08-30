@@ -10,9 +10,21 @@ document.getElementById("process-files").addEventListener("click", async () => {
   const saveToOriginalDir = document.getElementById("save-original-directory").checked;
 
   if (filePaths.length > 0 && filePaths[0]) {
-    const message = await ipcRenderer.invoke("process-pdfs", filePaths, saveToOriginalDir);
-    alert(message);
+    ipcRenderer.invoke("process-pdfs", filePaths, saveToOriginalDir);
   } else {
     alert("Please select PDF files to process.");
   }
+});
+
+ipcRenderer.on("progress-update", (event, progress) => {
+  const progressBar = document.getElementById("progress-bar");
+  const progressText = document.getElementById("progress-text");
+  progressBar.value = progress;
+  progressText.textContent = `Progress: ${progress}%`;
+});
+
+ipcRenderer.on("processing-complete", () => {
+  alert("Processing complete!");
+  document.getElementById("progress-bar").value = 0;
+  document.getElementById("progress-text").textContent = "Progress: 0%";
 });
