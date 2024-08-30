@@ -7,12 +7,19 @@
   </head>
   <body>
     <h1>PDF OCR Application</h1>
+
+    <label for="public-key">ILovePDF Project Public Key:</label><br />
+    <input type="text" id="public-key" placeholder="Enter your public key" style="width: 100%" /><br /><br />
+
+    <label for="secret-key">ILovePDF Secret Key:</label><br />
+    <input type="text" id="secret-key" placeholder="Enter your secret key" style="width: 100%" /><br /><br />
+
     <button id="select-files">Select PDF Files</button>
     <pre id="file-list"></pre>
 
-    <label> <input type="checkbox" id="save-original-directory" checked /> Save to Original Directory </label>
+    <label> <input type="checkbox" id="save-original-directory" /> Save to Original Directory </label>
     <br /><br />
-    <button id="select-output-folder" style="display: none">Select Output Folder</button>
+    <button id="select-output-folder">Select Output Folder</button>
     <p id="output-folder-path"></p>
 
     <br /><br />

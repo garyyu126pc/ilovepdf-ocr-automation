@@ -5,11 +5,6 @@ const AdmZip = require("adm-zip");
 const ILovePDFApi = require("@ilovepdf/ilovepdf-nodejs");
 const ILovePDFFile = require("@ilovepdf/ilovepdf-nodejs/ILovePDFFile");
 
-// Load environment variables from .env file
-require("dotenv").config();
-
-const instance = new ILovePDFApi(process.env.ILOVEPDF_PROJECT_PUBLIC_KEY, process.env.ILOVEPDF_SECRET_KEY);
-
 function createWindow() {
   const win = new BrowserWindow({
     width: 800,
@@ -51,8 +46,24 @@ ipcMain.handle("select-output-folder", async () => {
   }
 });
 
-ipcMain.handle("process-pdfs", async (event, filePaths, saveToOriginalDir, outputFolder) => {
+ipcMain.handle("validate-keys", async (event, publicKey, secretKey) => {
   try {
+    const instance = new ILovePDFApi(publicKey, secretKey);
+    await instance.newTask("pdfocr"); // Attempt to create a new task
+    return { valid: true };
+  } catch (error) {
+    dialog.showMessageBox({
+      type: "error",
+      title: "Invalid API Keys",
+      message: `The API keys you entered are invalid. Please check your keys and try again.\n\nError: ${error.message}`,
+    });
+    return { valid: false, error: error.message };
+  }
+});
+
+ipcMain.handle("process-pdfs", async (event, filePaths, saveToOriginalDir, outputFolder, publicKey, secretKey) => {
+  try {
+    const instance = new ILovePDFApi(publicKey, secretKey);
     const task = instance.newTask("pdfocr");
     await task.start();
 
@@ -76,7 +87,9 @@ ipcMain.handle("process-pdfs", async (event, filePaths, saveToOriginalDir, outpu
     }
 
     if (filePaths.length === 1) {
-      const filePath = saveToOriginalDir ? filePaths[0] : path.join(outputFolder, path.basename(filePaths[0]));
+      const originalFilePath = filePaths[0];
+      const fileName = path.basename(originalFilePath);
+      const filePath = saveToOriginalDir ? originalFilePath : path.join(outputFolder, fileName);
       await savePDFFile(arrayBuffer, filePath);
     } else {
       await savePDFFiles(arrayBuffer, filePaths, outputFolder, event);
@@ -84,7 +97,20 @@ ipcMain.handle("process-pdfs", async (event, filePaths, saveToOriginalDir, outpu
 
     event.sender.send("processing-complete");
   } catch (error) {
-    console.error("Error processing the PDF files:", error);
+    if (error.response && error.response.status === 400) {
+      // If it's a 400 error, it likely means the API keys are incorrect or the request is malformed
+      dialog.showMessageBox({
+        type: "error",
+        title: "Invalid API Keys",
+        message: `The API request failed with a 400 error. This typically indicates that the API keys are incorrect or missing. Please double-check your API keys and try again.`,
+      });
+    } else {
+      dialog.showMessageBox({
+        type: "error",
+        title: "Processing Error",
+        message: `An error occurred while processing the PDF files.\n\nError: ${error.message}`,
+      });
+    }
     throw error;
   }
 });
@@ -103,7 +129,7 @@ async function savePDFFiles(arrayBuffer, filePaths, outputFolder, event) {
   zip.getEntries().forEach((entry) => {
     if (entry.entryName.endsWith(".pdf")) {
       const originalFilePath = filePaths[i];
-      const fileName = path.basename(originalFilePath); // Extract only the file name
+      const fileName = path.basename(originalFilePath);
       const filePath = outputFolder ? path.join(outputFolder, fileName) : originalFilePath;
       fs.writeFileSync(filePath, entry.getData());
 

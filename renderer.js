@@ -28,8 +28,18 @@ document.getElementById("process-files").addEventListener("click", async () => {
   const saveToOriginalDir = document.getElementById("save-original-directory").checked;
   const outputFolder = document.getElementById("output-folder-path").textContent;
 
+  const publicKey = document.getElementById("public-key").value;
+  const secretKey = document.getElementById("secret-key").value;
+
+  // Validate API keys before proceeding
+  const validationResponse = await ipcRenderer.invoke("validate-keys", publicKey, secretKey);
+  if (!validationResponse.valid) {
+    alert("Invalid API keys: " + validationResponse.error);
+    return;
+  }
+
   if (filePaths.length > 0 && filePaths[0]) {
-    ipcRenderer.invoke("process-pdfs", filePaths, saveToOriginalDir, outputFolder);
+    ipcRenderer.invoke("process-pdfs", filePaths, saveToOriginalDir, outputFolder, publicKey, secretKey);
   } else {
     alert("Please select PDF files to process.");
   }
