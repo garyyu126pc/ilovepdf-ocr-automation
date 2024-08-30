@@ -1,0 +1,103 @@
+body {
+  font-family: "Roboto", sans-serif;
+  background-color: #f4f6f8;
+  color: #333;
+  margin: 0;
+  padding: 20px;
+}
+
+h1 {
+  font-size: 24px;
+  color: #333;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+label {
+  font-weight: 500;
+  margin-bottom: 5px;
+  display: inline-block;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+#file-list {
+  margin-bottom: 20px;
+}
+
+.file-item {
+  background-color: white;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.file-item span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 80%;
+}
+
+.remove-button {
+  background-color: #ff4d4f;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  color: white;
+  font-size: 12px;
+  border: none;
+}
+
+.remove-button:hover {
+  background-color: #d9363e;
+}
+
+#progress-bar {
+  width: 100%;
+  height: 20px;
+  border-radius: 10px;
+  background-color: #e0e0e0;
+  overflow: hidden;
+  margin-top: 20px;
+}
+
+#progress-bar::-webkit-progress-value {
+  background-color: #007bff;
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+#progress-text {
+  text-align: center;
+  margin-top: 5px;
+  font-size: 14px;
+}
