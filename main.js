@@ -39,7 +39,7 @@ ipcMain.handle("select-files", async () => {
   }
 });
 
-ipcMain.handle("process-pdfs", async (event, filePaths) => {
+ipcMain.handle("process-pdfs", async (event, filePaths, saveToOriginalDir) => {
   try {
     const task = instance.newTask("pdfocr");
     await task.start();
@@ -50,18 +50,17 @@ ipcMain.handle("process-pdfs", async (event, filePaths) => {
 
     await task.process();
     const arrayBuffer = await task.download();
-    console.log("arrayBuffer", arrayBuffer);
-    // Save the output files
-    const outputFolder = path.join(__dirname, "output");
-    if (!fs.existsSync(outputFolder)) {
+
+    const outputFolder = saveToOriginalDir ? null : path.join(__dirname, "output");
+    if (!saveToOriginalDir && !fs.existsSync(outputFolder)) {
       fs.mkdirSync(outputFolder);
     }
 
     if (filePaths.length === 1) {
-      const filePath = path.join(outputFolder, path.basename(filePaths[0]));
+      const filePath = saveToOriginalDir ? filePaths[0] : path.join(outputFolder, path.basename(filePaths[0]));
       await savePDFFile(arrayBuffer, filePath);
     } else {
-      await savePDFFiles(arrayBuffer, outputFolder);
+      await savePDFFiles(arrayBuffer, filePaths, outputFolder);
     }
 
     return "Processing complete!";
@@ -76,13 +75,15 @@ async function savePDFFile(arrayBuffer, filePath) {
   await fs.promises.writeFile(filePath, buffer);
 }
 
-async function savePDFFiles(arrayBuffer, outputFolder) {
+async function savePDFFiles(arrayBuffer, filePaths, outputFolder) {
   const buffer = Buffer.from(arrayBuffer);
   const zip = new AdmZip(buffer);
+  let i = 0;
   zip.getEntries().forEach((entry) => {
     if (entry.entryName.endsWith(".pdf")) {
-      const filePath = path.join(outputFolder, entry.entryName);
+      const filePath = outputFolder ? path.join(outputFolder, entry.entryName) : filePaths[i];
       fs.writeFileSync(filePath, entry.getData());
+      i++;
     }
   });
 }

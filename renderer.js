@@ -7,8 +7,10 @@ document.getElementById("select-files").addEventListener("click", async () => {
 
 document.getElementById("process-files").addEventListener("click", async () => {
   const filePaths = document.getElementById("file-list").textContent.split("\n");
+  const saveToOriginalDir = document.getElementById("save-original-directory").checked;
+
   if (filePaths.length > 0 && filePaths[0]) {
-    const message = await ipcRenderer.invoke("process-pdfs", filePaths);
+    const message = await ipcRenderer.invoke("process-pdfs", filePaths, saveToOriginalDir);
     alert(message);
   } else {
     alert("Please select PDF files to process.");
