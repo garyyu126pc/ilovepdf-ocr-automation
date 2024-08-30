@@ -29,8 +29,8 @@
     "electron-builder": "^23.6.0"
   },
   "dependencies": {
-    "adm-zip": "^0.4.7",
-    "@ilovepdf/ilovepdf-nodejs": "^1.0.0",
+    "@ilovepdf/ilovepdf-nodejs": "^0.3.0",
+    "adm-zip": "^0.5.15",
     "dotenv": "^16.0.0",
     "electron-store": "^8.0.0"
   }

@@ -4,6 +4,14 @@ const fs = require("fs");
 const AdmZip = require("adm-zip");
 const ILovePDFApi = require("@ilovepdf/ilovepdf-nodejs");
 const ILovePDFFile = require("@ilovepdf/ilovepdf-nodejs/ILovePDFFile");
+const Store = require("electron-store");
+
+// Load environment variables from .env in development
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
+
+const store = new Store();
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -20,6 +28,21 @@ function createWindow() {
 }
 
 app.whenReady().then(createWindow);
+
+// Function to get API keys, either from .env (development) or Store (production)
+ipcMain.handle("get-keys", () => {
+  const publicKey = process.env.ILOVEPDF_PROJECT_PUBLIC_KEY || store.get("publicKey", "");
+  const secretKey = process.env.ILOVEPDF_SECRET_KEY || store.get("secretKey", "");
+  return { publicKey, secretKey };
+});
+
+// Function to save API keys in production mode
+ipcMain.handle("save-keys", (event, publicKey, secretKey) => {
+  if (process.env.NODE_ENV === "production") {
+    store.set("publicKey", publicKey);
+    store.set("secretKey", secretKey);
+  }
+});
 
 ipcMain.handle("select-files", async () => {
   const { canceled, filePaths } = await dialog.showOpenDialog({

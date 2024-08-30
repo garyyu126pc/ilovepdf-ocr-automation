@@ -1,5 +1,11 @@
 const { ipcRenderer } = require("electron");
 
+document.addEventListener("DOMContentLoaded", async () => {
+  const { publicKey, secretKey } = await ipcRenderer.invoke("get-keys");
+  if (publicKey) document.getElementById("public-key").value = publicKey;
+  if (secretKey) document.getElementById("secret-key").value = secretKey;
+});
+
 document.getElementById("select-files").addEventListener("click", async () => {
   const filePaths = await ipcRenderer.invoke("select-files");
   document.getElementById("file-list").textContent = filePaths.join("\n");
@@ -30,6 +36,9 @@ document.getElementById("process-files").addEventListener("click", async () => {
 
   const publicKey = document.getElementById("public-key").value;
   const secretKey = document.getElementById("secret-key").value;
+
+  // Save the keys in production mode
+  await ipcRenderer.invoke("save-keys", publicKey, secretKey);
 
   // Validate API keys before proceeding
   const validationResponse = await ipcRenderer.invoke("validate-keys", publicKey, secretKey);
