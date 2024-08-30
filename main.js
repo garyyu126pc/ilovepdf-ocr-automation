@@ -38,10 +38,8 @@ ipcMain.handle("get-keys", () => {
 
 // Function to save API keys in production mode
 ipcMain.handle("save-keys", (event, publicKey, secretKey) => {
-  if (process.env.NODE_ENV === "production") {
-    store.set("publicKey", publicKey);
-    store.set("secretKey", secretKey);
-  }
+  store.set("publicKey", publicKey);
+  store.set("secretKey", secretKey);
 });
 
 ipcMain.handle("select-files", async () => {

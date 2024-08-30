@@ -5,8 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder",
-    "test": "mocha test.js"
+    "build": "electron-builder"
   },
   "build": {
     "appId": "com.yourcompany.yourapp",
@@ -16,6 +15,7 @@
     },
     "files": [
       "main.js",
+      "styles.css",
       "renderer.js",
       "index.html",
       "package.json",
