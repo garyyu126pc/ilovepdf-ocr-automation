@@ -16,7 +16,7 @@ document.getElementById("select-files").addEventListener("click", async () => {
   filePaths = [...filePaths, ...newFilePaths];
 
   // Update the UI to show all selected files
-  document.getElementById("file-list").textContent = filePaths.join("\n");
+  updateFileListUI();
 });
 
 document.getElementById("save-original-directory").addEventListener("change", () => {
@@ -73,3 +73,30 @@ ipcRenderer.on("processing-complete", () => {
   document.getElementById("progress-bar").value = 0;
   document.getElementById("progress-text").textContent = "Progress: 0%";
 });
+
+// Function to update the UI with the selected files and remove buttons
+function updateFileListUI() {
+  const fileListElement = document.getElementById("file-list");
+  fileListElement.innerHTML = ""; // Clear the existing list
+
+  filePaths.forEach((filePath, index) => {
+    const fileDiv = document.createElement("div");
+    fileDiv.classList.add("file-item");
+
+    const fileNameSpan = document.createElement("span");
+    fileNameSpan.textContent = filePath;
+
+    const removeButton = document.createElement("button");
+    removeButton.textContent = "Remove";
+    removeButton.style.marginLeft = "10px";
+    removeButton.addEventListener("click", () => {
+      // Remove the selected file from the filePaths array
+      filePaths.splice(index, 1);
+      updateFileListUI(); // Update the UI after removal
+    });
+
+    fileDiv.appendChild(fileNameSpan);
+    fileDiv.appendChild(removeButton);
+    fileListElement.appendChild(fileDiv);
+  });
+}
