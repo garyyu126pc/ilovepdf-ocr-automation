@@ -1,7 +1,7 @@
 {
   "name": "ilovepdf-ocr-automation",
   "version": "1.0.0",
-  "description": "A desktop application built with Electron that automates the process of OCR (Optical Character Recognition) for PDF files using the ILovePDF API. Users can easily select PDF files, apply OCR, and save the processed documents either in their original directories or in a chosen output folder. The app is designed for both development and production environments, with API keys managed securely through environment variables or user input.",
+  "description": "A desktop application built with Electron that automates the process of OCR (Optical Character Recognition) for PDF files using the iLovePDF API.",
   "main": "main.js",
   "scripts": {
     "start": "electron .",

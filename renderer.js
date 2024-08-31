@@ -1,6 +1,5 @@
 const { ipcRenderer } = require("electron");
 
-// Initialize an empty array to store file paths
 let filePaths = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -11,33 +10,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 document.getElementById("select-files").addEventListener("click", async () => {
   const newFilePaths = await ipcRenderer.invoke("select-files");
-
-  // Append new file paths to the existing array
   filePaths = [...filePaths, ...newFilePaths];
-
-  // Update the UI to show all selected files
   updateFileListUI();
 });
 
 document.getElementById("clear-all").addEventListener("click", () => {
-  // Clear the filePaths array
   filePaths = [];
-
-  // Update the UI to reflect the cleared state
   updateFileListUI();
 });
 
 document.getElementById("save-original-directory").addEventListener("change", () => {
   const isChecked = document.getElementById("save-original-directory").checked;
-  const outputFolderButton = document.getElementById("select-output-folder");
-  const outputFolderPath = document.getElementById("output-folder-path");
-
-  if (isChecked) {
-    outputFolderButton.style.display = "none";
-    outputFolderPath.textContent = "";
-  } else {
-    outputFolderButton.style.display = "block";
-  }
+  document.getElementById("select-output-folder").style.display = isChecked ? "none" : "block";
+  document.getElementById("output-folder-path").textContent = "";
 });
 
 document.getElementById("select-output-folder").addEventListener("click", async () => {
@@ -48,14 +33,11 @@ document.getElementById("select-output-folder").addEventListener("click", async 
 document.getElementById("process-files").addEventListener("click", async () => {
   const saveToOriginalDir = document.getElementById("save-original-directory").checked;
   const outputFolder = document.getElementById("output-folder-path").textContent;
-
   const publicKey = document.getElementById("public-key").value;
   const secretKey = document.getElementById("secret-key").value;
 
-  // Save the keys in production mode
   await ipcRenderer.invoke("save-keys", publicKey, secretKey);
 
-  // Validate API keys before proceeding
   const validationResponse = await ipcRenderer.invoke("validate-keys", publicKey, secretKey);
   if (!validationResponse.valid) {
     alert("Invalid API keys: " + validationResponse.error);
@@ -63,10 +45,7 @@ document.getElementById("process-files").addEventListener("click", async () => {
   }
 
   if (filePaths.length > 0) {
-    // Show the progress overlay before starting processing
-    const progressOverlay = document.getElementById("progress-overlay");
-    progressOverlay.style.display = "block";
-
+    document.getElementById("progress-overlay").style.display = "block";
     ipcRenderer.invoke("process-pdfs", filePaths, saveToOriginalDir, outputFolder, publicKey, secretKey);
   } else {
     alert("Please select PDF files to process.");
@@ -74,37 +53,20 @@ document.getElementById("process-files").addEventListener("click", async () => {
 });
 
 ipcRenderer.on("progress-update", (event, progress) => {
-  const progressBar = document.getElementById("progress-bar");
-  const progressText = document.getElementById("progress-text");
-  progressBar.value = progress;
-  progressText.textContent = `Progress: ${progress}%`;
+  document.getElementById("progress-bar").value = progress;
+  document.getElementById("progress-text").textContent = `Progress: ${progress}%`;
 });
 
 ipcRenderer.on("processing-complete", () => {
   alert("Processing complete!");
-
-  // Reset progress bar and hide the progress overlay
-  const progressOverlay = document.getElementById("progress-overlay");
-  progressOverlay.style.display = "none";
-  const progressBar = document.getElementById("progress-bar");
-  progressBar.value = 0;
-  const progressText = document.getElementById("progress-text");
-  progressText.textContent = "Progress: 0%";
+  resetProgressUI();
 });
 
-ipcRenderer.on("hide-progress-overlay", () => {
-  const progressOverlay = document.getElementById("progress-overlay");
-  progressOverlay.style.display = "none";
-  const progressBar = document.getElementById("progress-bar");
-  progressBar.value = 0;
-  const progressText = document.getElementById("progress-text");
-  progressText.textContent = "Progress: 0%";
-});
+ipcRenderer.on("hide-progress-overlay", resetProgressUI);
 
-// Function to update the UI with the selected files and remove buttons
 function updateFileListUI() {
   const fileListElement = document.getElementById("file-list");
-  fileListElement.innerHTML = ""; // Clear the existing list
+  fileListElement.innerHTML = "";
 
   filePaths.forEach((filePath, index) => {
     const fileDiv = document.createElement("div");
@@ -115,15 +77,20 @@ function updateFileListUI() {
 
     const removeButton = document.createElement("button");
     removeButton.textContent = "Remove";
-    removeButton.style.marginLeft = "10px";
+    removeButton.classList.add("remove-button");
     removeButton.addEventListener("click", () => {
-      // Remove the selected file from the filePaths array
       filePaths.splice(index, 1);
-      updateFileListUI(); // Update the UI after removal
+      updateFileListUI();
     });
 
     fileDiv.appendChild(fileNameSpan);
     fileDiv.appendChild(removeButton);
     fileListElement.appendChild(fileDiv);
   });
+}
+
+function resetProgressUI() {
+  document.getElementById("progress-overlay").style.display = "none";
+  document.getElementById("progress-bar").value = 0;
+  document.getElementById("progress-text").textContent = "Progress: 0%";
 }

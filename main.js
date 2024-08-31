@@ -6,17 +6,18 @@ const ILovePDFApi = require("@ilovepdf/ilovepdf-nodejs");
 const ILovePDFFile = require("@ilovepdf/ilovepdf-nodejs/ILovePDFFile");
 const Store = require("electron-store");
 
-// Load environment variables from .env in development
+// Initialize electron-store
+const store = new Store();
+
+// Load environment variables in development
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
 
-const store = new Store();
-
 function createWindow() {
   const win = new BrowserWindow({
-    width: 1024, // Default width
-    height: 1024, // Default height
+    width: 1024,
+    height: 1024,
     webPreferences: {
       preload: path.join(__dirname, "renderer.js"),
       nodeIntegration: true,
@@ -29,48 +30,41 @@ function createWindow() {
 
 app.whenReady().then(createWindow);
 
-// Function to get API keys, either from .env (development) or Store (production)
+// Fetch API keys
 ipcMain.handle("get-keys", () => {
   const publicKey = process.env.ILOVEPDF_PROJECT_PUBLIC_KEY || store.get("publicKey", "");
   const secretKey = process.env.ILOVEPDF_SECRET_KEY || store.get("secretKey", "");
   return { publicKey, secretKey };
 });
 
-// Function to save API keys in production mode
+// Save API keys
 ipcMain.handle("save-keys", (event, publicKey, secretKey) => {
   store.set("publicKey", publicKey);
   store.set("secretKey", secretKey);
 });
 
+// File selection dialog
 ipcMain.handle("select-files", async () => {
   const { canceled, filePaths } = await dialog.showOpenDialog({
     properties: ["openFile", "multiSelections"],
     filters: [{ name: "PDF Files", extensions: ["pdf"] }],
   });
-
-  if (canceled) {
-    return [];
-  } else {
-    return filePaths;
-  }
+  return canceled ? [] : filePaths;
 });
 
+// Output folder selection dialog
 ipcMain.handle("select-output-folder", async () => {
   const { canceled, filePaths } = await dialog.showOpenDialog({
     properties: ["openDirectory"],
   });
-
-  if (canceled) {
-    return "";
-  } else {
-    return filePaths[0];
-  }
+  return canceled ? "" : filePaths[0];
 });
 
+// Validate API keys
 ipcMain.handle("validate-keys", async (event, publicKey, secretKey) => {
   try {
     const instance = new ILovePDFApi(publicKey, secretKey);
-    await instance.newTask("pdfocr"); // Attempt to create a new task
+    await instance.newTask("pdfocr");
     return { valid: true };
   } catch (error) {
     dialog.showMessageBox({
@@ -82,6 +76,7 @@ ipcMain.handle("validate-keys", async (event, publicKey, secretKey) => {
   }
 });
 
+// Process PDF files
 ipcMain.handle("process-pdfs", async (event, filePaths, saveToOriginalDir, outputFolder, publicKey, secretKey) => {
   try {
     const instance = new ILovePDFApi(publicKey, secretKey);
@@ -101,33 +96,28 @@ ipcMain.handle("process-pdfs", async (event, filePaths, saveToOriginalDir, outpu
     await task.process();
     const arrayBuffer = await task.download();
 
-    if (saveToOriginalDir) {
-      outputFolder = null;
-    } else if (!fs.existsSync(outputFolder)) {
+    if (!saveToOriginalDir && !fs.existsSync(outputFolder)) {
       fs.mkdirSync(outputFolder);
     }
 
     if (filePaths.length === 1) {
-      const originalFilePath = filePaths[0];
-      const fileName = path.basename(originalFilePath);
-      const filePath = saveToOriginalDir ? originalFilePath : path.join(outputFolder, fileName);
-      await savePDFFile(arrayBuffer, filePath);
+      await savePDFFile(
+        arrayBuffer,
+        saveToOriginalDir ? filePaths[0] : path.join(outputFolder, path.basename(filePaths[0]))
+      );
     } else {
-      await savePDFFiles(arrayBuffer, filePaths, outputFolder, event);
+      await savePDFFiles(arrayBuffer, filePaths, saveToOriginalDir ? null : outputFolder, event);
     }
 
     event.sender.send("processing-complete");
   } catch (error) {
-    // Hide the progress overlay if an error occurs
     event.sender.send("hide-progress-overlay");
-
-    // Show the error message to the user
     dialog.showMessageBox({
       type: "error",
       title: "Processing Error",
       message: `An error occurred while processing the PDF files.\n\nError: ${error.message}`,
     });
-    throw error; // Re-throw the error to ensure it’s logged or handled further if necessary
+    throw error;
   }
 });
 
@@ -140,17 +130,14 @@ async function savePDFFiles(arrayBuffer, filePaths, outputFolder, event) {
   const buffer = Buffer.from(arrayBuffer);
   const zip = new AdmZip(buffer);
   let i = 0;
-  const totalFiles = filePaths.length;
 
   zip.getEntries().forEach((entry) => {
     if (entry.entryName.endsWith(".pdf")) {
-      const originalFilePath = filePaths[i];
-      const fileName = path.basename(originalFilePath);
-      const filePath = outputFolder ? path.join(outputFolder, fileName) : originalFilePath;
+      const filePath = outputFolder ? path.join(outputFolder, path.basename(filePaths[i])) : filePaths[i];
       fs.writeFileSync(filePath, entry.getData());
 
       i++;
-      const progress = Math.floor((i / totalFiles) * 100);
+      const progress = Math.floor((i / filePaths.length) * 100);
       event.sender.send("progress-update", progress);
     }
   });
